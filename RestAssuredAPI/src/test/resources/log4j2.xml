@@ -1,0 +1,36 @@
+<Configuration status="WARN">
+
+	<Appenders>
+
+		<Console name="Console" target="SYSTEM_OUT">
+			<!-- %d - represent the timestamp, %t tell the thread name %5-level
+			tells the level of logging-->
+			<!-- %logger{36} tells the name of the class from where logs is
+			generated -->
+			<!-- %msg tells to print the complete message and %n tells to switch
+			to next line-->
+			<PatternLayout
+				pattern="%d{HH:mm:ss:SSS} [%t] %-5level %logger{36} - %msg%n"></PatternLayout>
+		</Console>
+
+
+		<File name="File" fileName="logs/test.log">
+			<PatternLayout
+				pattern="%d{HH:mm:ss:SSS} [%t] %-5level %logger{36} - %msg%n"></PatternLayout>
+
+		</File>
+
+
+	</Appenders>
+
+	<Loggers>
+		<Root level="info">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="File" />
+		</Root>
+
+
+	</Loggers>
+
+
+</Configuration>

@@ -1,0 +1,11 @@
+<suite name="Suite">
+	<test thread-count="5" name="Test">
+		<classes>
+			<class name="com.api.tests.LoginAPITest" />
+		</classes>
+	</test>
+	<!--  Test  -->
+	<listeners>
+		<listener class-name="com.api.listeners.TestListener" />
+	</listeners>
+</suite>
