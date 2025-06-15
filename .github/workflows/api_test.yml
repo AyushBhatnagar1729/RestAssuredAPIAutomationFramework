@@ -1,0 +1,76 @@
+# Workflow Name: Identifies your workflow in the GitHub Actions UI
+name: API Automation Tests
+
+# Triggering Events: When should this workflow run?
+on:
+  # 1. On push to main branch: Runs whenever code is pushed to the 'main' branch
+  push:
+    branches:
+      - master
+
+  # 2. On pull request to main branch: Runs whenever a pull request targets the 'main' branch
+  pull_request:
+    branches:
+      - master
+
+
+  schedule:
+    # Run daily at 1:00 AM IST (19:30 UTC)
+    - cron: '30 19 * * *'
+    # Run daily at 4:00 PM IST (10:30 UTC)
+    - cron: '30 10 * * *'
+
+# Job Definitions: What tasks should be executed?
+jobs:
+  build_and_test:
+    # Runner Environment: Specifies the type of virtual machine to run the job on.
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      actions: write
+      checks: write
+      issues: write
+      pull-requests: write
+
+    # Steps: A sequence of tasks to be executed in the job.
+    steps:
+      # Step 1: Checkout Repository Code
+      # This action fetches your repository's code into the runner.
+      - name: Checkout Code
+        uses: actions/checkout@v4 # Uses a pre-built GitHub Action for checking out code
+
+      # Step 2: Set up Java Development Kit (JDK 17)
+      # Configures the Java environment required to build and run your Maven project.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4 # Uses a pre-built GitHub Action for setting up Java
+        with:
+          java-version: '17' # Specify JDK 17
+          distribution: 'temurin' # A popular OpenJDK distribution
+          cache: maven # Caches Maven dependencies to speed up subsequent runs
+
+      # Step 3: Clean, Build, and Run Tests with Maven
+      # Executes your Maven command to clean the project, compile, and run TestNG tests.
+      - name: Run Maven Tests
+        run: mvn clean test -DsuiteXmlFile=testng.xml
+        # -DsuiteXmlFile=testng.xml ensures TestNG uses your custom suite configuration.
+
+      # Step 4: Archive Test Results (TestNG HTML Reports and XML)
+      # Uploads the generated TestNG reports (HTML, XML) as an artifact.
+      # These can be downloaded from the GitHub Actions run summary page.
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v4 # Uses a pre-built GitHub Action for uploading artifacts
+        with:
+          name: test-results-reports # Name of the artifact bundle
+          path: target/surefire-reports/ # Path to the directory containing TestNG reports
+          # This path contains testng-results.xml and all generated HTML reports.
+          # You can download and open the index.html or other HTML files locally to view res
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: testng results
+          path: target/surefire-reports/junitreports/TEST.*.xml
+          reporter: java-junit
+     
